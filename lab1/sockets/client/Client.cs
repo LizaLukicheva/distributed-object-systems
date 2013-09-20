@@ -15,6 +15,7 @@ namespace client
         // then create it. Otherwise return null.
         public static Expression createExpression(String expression)
         {
+            expression.Trim(' ');
             if (checkExpression(expression))
             {
                 return new Expression(expression);

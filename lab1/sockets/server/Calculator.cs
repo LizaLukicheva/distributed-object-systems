@@ -48,13 +48,8 @@ namespace server
             server.Start();
         }
 
-
-        public void listen()
+        private void getExpressionFromClient(TcpClient client)
         {
-            // Perfom a blocking call to accept requests.
-            // You could also use server.AcceptSocket() here.
-            TcpClient client = server.AcceptTcpClient();
-
             // Buffer for reading data
             Byte[] buffer = new Byte[256];
             String data = null;
@@ -70,11 +65,19 @@ namespace server
 
             // Process the data sent by client (calculate polish).
             Calculator calculator = new Calculator(data);
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(Convert.ToString(calculator.getResult()));
+            int resultOfExpression = calculator.getResult();
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(Convert.ToString(resultOfExpression));
 
             // Send back a response.
             stream.Write(msg, 0, msg.Length);
-            Console.WriteLine("Sent: {0} ", msg);
+            System.Console.WriteLine("Sent: {0} ", resultOfExpression);
+        }
+
+        public void listen()
+        {
+            // Perfom a blocking call to accept requests.
+            // You could also use server.AcceptSocket() here.
+            this.getExpressionFromClient(server.AcceptTcpClient());
         }
 
         public void endServer()

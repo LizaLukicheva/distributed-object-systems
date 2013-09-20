@@ -8,6 +8,9 @@ namespace Polska
 {
     public class PolishString
     {
+        private String casual;
+        private String polska;
+
         public PolishString(String expression)
         {
             this.casual = expression;
@@ -16,8 +19,7 @@ namespace Polska
 
         private Boolean isDigit(char c)
         { 
-            return ( c >= '0' && 
-                c <= '9');
+            return ( c >= '0' && c <= '9');
         }
 
         private int priority(char c)
@@ -41,8 +43,8 @@ namespace Polska
         public void createPolska() 
         {
             var tempStack = new Stack<char>();
-            int maxStackPriority = 0;
 
+            // Parse normal expression
             for (int i=0; i<this.casual.Length; i++)
             {
                 char currentChar = this.casual[i];
@@ -62,7 +64,6 @@ namespace Polska
                         if (tempStack.Count == 0 || priority(tempStack.First()) < priority(currentChar))
                         {
                             tempStack.Push(currentChar);
-                            maxStackPriority = priority(currentChar);
                             break;
                         }
                         else if (priority(currentChar) <= priority(tempStack.First()))
@@ -71,7 +72,7 @@ namespace Polska
                             {
                                 this.polska = this.polska + ' ' + tempStack.Pop();
                             }
-                            while (priority(currentChar) <= priority(tempStack.First()));
+                            while (tempStack.Count > 0 && priority(currentChar) <= priority(tempStack.First()));
                         }
                         else break;
                     }
@@ -90,6 +91,7 @@ namespace Polska
                 }
             }
 
+            // Add last signs to polish string
             while (tempStack.Count != 0) 
             {
                 char charFromTemp = tempStack.Pop();
@@ -147,22 +149,5 @@ namespace Polska
         {
             return this.polska;
         }
-
-        private String casual;
-        private String polska;
-        private string p;
     }
-
-    //class Polish
-    //{
-    //    static void Main(string[] args)
-    //    {
-    //        while (true)
-    //        {
-    //            string readedString = System.Console.ReadLine();
-    //            var p = new PolishString(readedString);
-    //            System.Console.WriteLine(p.getPolska() + " = " + Convert.ToString(p.calculatePolska()));
-    //        }
-    //    }
-    //}
 }
