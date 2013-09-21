@@ -27,8 +27,82 @@ namespace client
             }
         }
 
+        static private Boolean isOpenBracket(char c)
+        {
+            return (c == '(');
+        }
+
+        static private Boolean isClosedBracket(char c)
+        {
+            return (c == ')');
+        }
+
+        static private Boolean isDigit(char c)
+        {
+            return (c >= '0' && c<='9');
+        }
+
+        static private Boolean isSign(char c)
+        {
+            return (c == '+' || c == '-' || c == '*' || c == '/');
+        }
+
         private static Boolean checkExpression(String expression)
         {
+            // Check digits expression
+            String withoutDigits = expression.Trim('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+            if (withoutDigits == expression)
+                return false;
+
+
+            // Open/close bracket 
+
+            int i = 0;
+            foreach (char c in expression)
+            {
+
+                if (isOpenBracket(c))
+                {
+                    i++;
+                }
+                else if (isClosedBracket(c))
+                {
+                    i--;
+                }
+                else if (!(isDigit(c) || isSign(c)))
+                    return false;
+
+                if (i < 0)
+                {
+                    return false;
+                }
+            }
+
+            if (i != 0) 
+            {
+                return false;
+            }
+
+            // Check order
+
+            if (expression.Length == 0 ||  isSign(expression[0]))
+            {
+                return false;
+            }
+
+            for (i = 1; i < expression.Length; i++)
+            {
+                char current = expression[i], prev = expression[i - 1];
+
+                if ((isSign(current) && (isSign(prev) || isOpenBracket(prev)))
+                    || (isOpenBracket(current) && isDigit(prev))
+                    || (isClosedBracket(current) && isSign(prev))
+                    || (isDigit(current) && isClosedBracket(prev)))
+                {
+                    return false;
+                }
+            }
+
             return true;
         }
 
@@ -148,9 +222,10 @@ namespace client
         static private void sendString()
         {
             int res = 0;
-            if (client.sendString(expression, ref res))
+            if (client.sendString(expression.getExpession(), ref res))
             {
-                System.Console.WriteLine("Answer: ", res);
+                System.Console.Write("Answer: ");
+                System.Console.WriteLine(res);
             }
             else
             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using Polska;
@@ -46,10 +47,21 @@ namespace server
             server = new TcpListener(localAddr, port);
 
             server.Start();
+
+            // Define maximum threads count
+            int maxThreadCount = Environment.ProcessorCount * 4;
+
+            // Set max count of working threads
+            ThreadPool.SetMaxThreads(maxThreadCount, maxThreadCount);
+
+            // Set min count of working threads.
+            ThreadPool.SetMinThreads(2, 2);
         }
 
-        private void getExpressionFromClient(TcpClient client)
+        static void getExpressionFromClient(Object stateInfo)
         {
+            TcpClient client =  (TcpClient)stateInfo;
+
             // Buffer for reading data
             Byte[] buffer = new Byte[256];
             String data = null;
@@ -75,9 +87,12 @@ namespace server
 
         public void listen()
         {
+            ThreadPool.QueueUserWorkItem(new WaitCallback(getExpressionFromClient), 
+                server.AcceptTcpClient()); 
+
             // Perfom a blocking call to accept requests.
             // You could also use server.AcceptSocket() here.
-            this.getExpressionFromClient(server.AcceptTcpClient());
+            //this.getExpressionFromClient(server.AcceptTcpClient());
         }
 
         public void endServer()
