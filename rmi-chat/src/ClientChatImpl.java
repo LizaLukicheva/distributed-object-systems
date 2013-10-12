@@ -11,17 +11,12 @@ public class ClientChatImpl extends UnicastRemoteObject
 	private ServerChat server = null;
 
 	public ClientChatImpl() throws RemoteException, MalformedURLException, NotBoundException {
-		server = (ServerChat)Naming.lookup("rmi://localhost/ServerChat");
+		this.server = (ServerChat)Naming.lookup("rmi://localhost/ServerChat");
+
+		System.out.println("Enter your name: ");
+		this.name = readLine();
 		
-		name = readLine();
-		//server.register(this);
-		
-		System.out.print("Enter port: ");
-		int port = Integer.parseInt(readLine());
-		
-		// Register clients interface
-		//String BINDING_NAME = "rmi://localhost:"+port+"/" + name;
-		//Naming.rebind(BINDING_NAME, this);
+		server.register(this);
 	}
 	
 	private static String readLine() {
@@ -38,24 +33,22 @@ public class ClientChatImpl extends UnicastRemoteObject
 		return readed;
 	}
 	
-	public void chat() throws RemoteException {
-		System.out.printf(name + "(you): ");
-		String message = readLine();
-		server.sendMessage(name, message);
+	public void chat() throws RemoteException {	
+		while (true) {
+			String message = readLine();
+			server.sendMessage(this.name, message);
+		}
 	}
 	
 	@Override
-	public void newMessage(String user, String message) throws RemoteException {
-		System.out.println(name + ": " + message);
+	public void newMessage(String user, String message) throws RemoteException {		
+		if (!user.equals(this.name)) {
+			System.out.println(user + ": " + message);
+		}
 	}
 	
 	public static void main (String[] args) throws Exception {
-		System.out.println("Enter your name: ");
-
-		ClientChatImpl client = new ClientChatImpl();
-		
-		while (true) {
-			client.chat();
-		}
+		ClientChatImpl client = new ClientChatImpl();	
+		client.chat();
 	}
 }

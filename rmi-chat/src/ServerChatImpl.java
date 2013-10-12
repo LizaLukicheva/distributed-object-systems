@@ -1,12 +1,13 @@
 import java.rmi.*;
 import java.rmi.server.*;
 import java.rmi.registry.*;
+import java.util.ArrayList;
 import java.net.*;
 
 public class ServerChatImpl extends UnicastRemoteObject 
 		implements ServerChat {
 	
-	ClientChat[] clients;
+	ArrayList<ClientChat> clients = new ArrayList<ClientChat>();	
 	
 	public ServerChatImpl() throws RemoteException {
 		
@@ -14,17 +15,15 @@ public class ServerChatImpl extends UnicastRemoteObject
 
 	@Override
 	public void sendMessage (String userName, String message) throws RemoteException {
-		// TODO Auto-generated method stub
-		/*for (ClientChat client : clients) {
+		for (ClientChat client : clients) {
 			client.newMessage(userName, message);
-		}*/
+		}
 		System.out.println(userName + ": " + message);
 	}
 
 	@Override
 	public void register(ClientChat newClient) throws RemoteException {
-		// TODO Auto-generated method stub
-		clients[clients.length] = newClient;
+		clients.add(newClient);
 	}
 	
 	public static void main(String[] args) throws Exception {
